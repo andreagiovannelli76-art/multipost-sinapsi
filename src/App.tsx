@@ -265,7 +265,7 @@ export default function App() {
         <div className="brand-block">
           <div className="brand-icon"><Wand2 size={22} /></div>
           <div>
-            <h1>{APP_CONFIG.name} v2.3.7</h1>
+            <h1>{APP_CONFIG.name} v2.3.8</h1>
             <p>{APP_CONFIG.payoff}</p>
           </div>
         </div>
