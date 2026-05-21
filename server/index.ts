@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || '127.0.0.1';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const APP_VERSION = '2.3.6';
+const APP_VERSION = '2.3.8';
 const MAX_MASTER_TEXT_CHARS = 15000;
 
 type AiProvider = 'openai' | 'gemini' | 'local';
@@ -274,7 +274,9 @@ function buildUserInput(brief: ReturnType<typeof normalizeBrief>, taskType: Task
       'Rispetta i limiti caratteri.',
       'Produci contenuti pubblicabili in italiano.',
       'Se il masterText contiene claim rischiosi, correggili e aggiungi warning.',
-      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. È VIETATO usare termini promissori o assoluti come "profittevole", "successo", "garantito", o espressioni come "proteggere l\'investimento", a meno che non siano supportati da dati inconfutabili forniti nel brief. Sostituisci questi termini con concetti basati su metodo, analisi e potenziale. Non fare mai promesse sui ritorni.'
+      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. È VIETATO usare termini promissori o assoluti come "profittevole", "successo", "garantito", o espressioni come "proteggere l\'investimento", a meno che non siano supportati da dati inconfutabili forniti nel brief. Sostituisci questi termini con concetti basati su metodo, analisi e potenziale. Non fare mai promesse sui ritorni.',
+      'PRECISIONE NUMERICA: Rispetta SEMPRE le liste e i numeri espliciti presenti nel brief. Se l\'utente indica 7 aspetti, 7 errori o 7 punti, ogni adattamento multicanale deve mantenere esattamente 7 punti, senza comprimerli, riassumerli o tagliarli autonomamente per motivi di formato.',
+      'DATI QUANTITATIVI: Evita formule quantitative non supportate da dati (es. "può raddoppiare l\'investimento", "aumenta del 30%"). Preferisci formule prudenti come "può incidere molto", "può modificare il margine", o "può rendere l\'operazione meno sostenibile".'
     ]
   });
 }
