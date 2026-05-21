@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || '127.0.0.1';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const APP_VERSION = '2.4.0-chunking';
+const APP_VERSION = '2.3.6';
 const MAX_MASTER_TEXT_CHARS = 15000;
 
 type AiProvider = 'openai' | 'gemini' | 'local';
@@ -78,7 +78,7 @@ app.post('/api/campaign', async (req, res) => {
     }
 
     // IL CHUNKING IN AZIONE: Generiamo prima il CORE, poi la STRATEGIA
-    console.log(`[SME v2.4] Avvio generazione per formato: ${brief.format}`);
+    console.log(`[SME v${APP_VERSION}] Avvio generazione per formato: ${brief.format}`);
     const finalCampaign = await generateCampaignWithChunking(brief);
     
     res.json(sanitizeCampaign(finalCampaign, brief.platforms));
@@ -120,7 +120,7 @@ function getActiveModelName() {
 
 // GESTORE DEL CHUNKING
 async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBrief>) {
-  console.log('[SME v2.4] Step 1: Generazione contenuti CORE...');
+  console.log(`[SME v${APP_VERSION}] Step 1: Generazione contenuti CORE...`);
   const coreData = activeProvider === 'gemini'
     ? await generateWithGemini(brief, 'core')
     : await generateWithOpenAI(brief, 'core');
@@ -128,7 +128,7 @@ async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBr
   let strategyData = createFallbackAnnualStrategy(brief); // Default di base
 
   if (brief.format === 'strategia-12-mesi') {
-    console.log('[SME v2.4] Step 2: Generazione STRATEGIA ANNUALE...');
+    console.log(`[SME v${APP_VERSION}] Step 2: Generazione STRATEGIA ANNUALE...`);
     strategyData = activeProvider === 'gemini'
       ? await generateWithGemini(brief, 'strategy')
       : await generateWithOpenAI(brief, 'strategy');
@@ -273,7 +273,8 @@ function buildUserInput(brief: ReturnType<typeof normalizeBrief>, taskType: Task
     outputRules: [
       'Rispetta i limiti caratteri.',
       'Produci contenuti pubblicabili in italiano.',
-      'Se il masterText contiene claim rischiosi, correggili e aggiungi warning.'
+      'Se il masterText contiene claim rischiosi, correggili e aggiungi warning.',
+      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. È VIETATO usare termini promissori o assoluti come "profittevole", "successo", "garantito", o espressioni come "proteggere l\'investimento", a meno che non siano supportati da dati inconfutabili forniti nel brief. Sostituisci questi termini con concetti basati su metodo, analisi e potenziale. Non fare mai promesse sui ritorni.'
     ]
   });
 }

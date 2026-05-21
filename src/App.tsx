@@ -225,7 +225,16 @@ export default function App() {
 
   const exportMarkdown = () => {
     if (!result) return;
-    const markdown = toMarkdown(brief, result);
+
+    // V2.3.6: Check se la strategia è mancante (fallback)
+    const isStrategyFallback = result.annualStrategy?.positioningDiagnosis?.includes('Fallback');
+    
+    // Mostra un alert all'utente se la strategia non è stata generata
+    if (isStrategyFallback && brief.format === 'strategia-12-mesi') {
+        alert("Attenzione: La strategia editoriale 12 mesi non è stata generata correttamente dal motore (Fallback) e verrà omessa dal documento. Prova a rigenerare la campagna.");
+    }
+
+    const markdown = toMarkdown(brief, result, isStrategyFallback);
     downloadTextFile(`campagna-sme-${new Date().toISOString().slice(0, 10)}.md`, markdown, 'text/markdown');
   };
 
@@ -260,7 +269,7 @@ export default function App() {
         <div className="brand-block">
           <div className="brand-icon"><Wand2 size={22} /></div>
           <div>
-            <h1>{APP_CONFIG.name}</h1>
+            <h1>{APP_CONFIG.name} v2.3.6</h1>
             <p>{APP_CONFIG.payoff}</p>
           </div>
         </div>
@@ -607,7 +616,7 @@ export default function App() {
             <div className="section-title">
               <div>
                 <h2>Dati, privacy e integrazione SME</h2>
-                <p>Versione 2.3.5: gestione provider OpenAI/Gemini, scheda aziendale, loader progressivo e storage locale più robusto.</p>
+                <p>Versione 2.3.6: compliance prudenziale, markdown pulito e autosostituzione contatti.</p>
               </div>
               <ShieldCheck size={24} />
             </div>
@@ -747,14 +756,32 @@ function labelize(value: string) {
   return value.replace(/-/g, ' ').replace(/\b\w/g, (letter: string) => letter.toUpperCase());
 }
 
-function toMarkdown(brief: CampaignBrief, result: CampaignResult) {
-  const posts = result.posts.map(post => `## ${getPlatform(post.platform).name}\n\n### ${post.title}\n\n${post.content}\n\n**CTA:** ${post.cta}\n\n**Asset:** ${post.assetIdea}\n\n**Note:** ${post.notes}\n`).join('\n---\n\n');
+function toMarkdown(brief: CampaignBrief, result: CampaignResult, isStrategyFallback: boolean) {
+  
+  // V2.3.6: Prepara i contatti e i post
+  const contactInfo = brief.companyProfile.websiteOrContact || '[LINK/CONTATTO]';
+  let postsMD = result.posts.map(post => `## ${getPlatform(post.platform).name}\n\n### ${post.title}\n\n${post.content}\n\n**CTA:** ${post.cta}\n\n**Asset:** ${post.assetIdea}\n\n**Note:** ${post.notes}\n`).join('\n---\n\n');
+  
+  // V2.3.6: Auto-sostituzione del placeholder con il contatto reale
+  postsMD = postsMD.replace(/\[.*?Link.*?\]|\[.*?Email.*?\]|\[.*?Contatto.*?\]/gi, contactInfo);
+
   const calendar = result.calendar.map(item => `- **${item.day}** · ${getPlatform(item.channel).name} · ${item.format}: ${item.topic} (${item.objective})`).join('\n');
   const hooks = result.hooks.map(hook => `- ${hook}`).join('\n');
   const warnings = result.warnings.map(warning => `- ${warning}`).join('\n');
+  
   const annual = result.annualStrategy;
   const quarters = annual.quarterlyPlan.map(item => `- **${item.quarter}:** ${item.focus}. Obiettivi: ${item.objectives.join(', ')}. Temi: ${item.contentThemes.join(', ')}`).join('\n');
   const months = annual.monthlyThemes.map(item => `- **${item.month}:** ${item.theme} — ${item.campaignIdea}. KPI: ${item.mainKpi}`).join('\n');
 
-  return `# Campagna ${result.engine}\n\n**Brand:** ${brief.brandName}\n**Settore:** ${brief.sector}\n**Target:** ${brief.targetAudience}\n**Obiettivo:** ${brief.objective}\n**Tono:** ${brief.tone}\n**Formato:** ${brief.format}\n**Posizionamento:** ${brief.companyProfile.positioning || 'Non specificato'}\n**Offerta:** ${brief.companyProfile.offer || 'Non specificata'}\n**Brand voice:** ${brief.companyProfile.brandVoice || 'Non specificato'}\n**Contatto/Sito:** ${brief.companyProfile.websiteOrContact || '[LINK/CONTATTO]'}\n\n## Sintesi\n\n${result.summary}\n\n## Avvisi\n\n${warnings || '- Nessun avviso.'}\n\n## Hook\n\n${hooks}\n\n## Strategia Editoriale 12 Mesi\n\n### Diagnosi\n\n${annual.positioningDiagnosis}\n\n### Obiettivi annuali\n\n${annual.annualObjectives.map(item => `- ${item}`).join('\n')}\n\n### Pilastri editoriali\n\n${annual.editorialPillars.map(item => `- ${item}`).join('\n')}\n\n### Trimestri\n\n${quarters}\n\n### Temi mensili\n\n${months}\n\n### Cadenza sostenibile\n\n${annual.sustainableCadence}\n\n### KPI\n\n${annual.kpis.map(item => `- ${item}`).join('\n')}\n\n### Revisione\n\n${annual.reviewProcess}\n\n${posts}\n\n## Calendario consigliato\n\n${calendar || '- Non disponibile.'}\n`;
+  // V2.3.6: Assemblaggio del documento escludendo la strategia se è un fallback
+  let md = `# Campagna ${result.engine}\n\n**Brand:** ${brief.brandName}\n**Settore:** ${brief.sector}\n**Target:** ${brief.targetAudience}\n**Obiettivo:** ${brief.objective}\n**Tono:** ${brief.tone}\n**Formato:** ${brief.format}\n**Posizionamento:** ${brief.companyProfile.positioning || 'Non specificato'}\n**Offerta:** ${brief.companyProfile.offer || 'Non specificata'}\n**Brand voice:** ${brief.companyProfile.brandVoice || 'Non specificato'}\n**Contatto/Sito:** ${contactInfo}\n\n## Sintesi\n\n${result.summary}\n\n## Avvisi\n\n${warnings || '- Nessun avviso.'}\n\n## Hook\n\n${hooks}\n\n`;
+  
+  if (!isStrategyFallback) {
+      md += `## Strategia Editoriale 12 Mesi\n\n### Diagnosi\n\n${annual.positioningDiagnosis}\n\n### Obiettivi annuali\n\n${annual.annualObjectives.map(item => `- ${item}`).join('\n')}\n\n### Pilastri editoriali\n\n${annual.editorialPillars.map(item => `- ${item}`).join('\n')}\n\n### Trimestri\n\n${quarters}\n\n### Temi mensili\n\n${months}\n\n### Cadenza sostenibile\n\n${annual.sustainableCadence}\n\n### KPI\n\n${annual.kpis.map(item => `- ${item}`).join('\n')}\n\n### Revisione\n\n${annual.reviewProcess}\n\n`;
+  }
+
+  md += `${postsMD}\n\n## Calendario consigliato\n\n${calendar || '- Non disponibile.'}\n`;
+  
+  // V2.3.6: Pulizia finale di sicurezza per rimuovere qualsiasi "Fallback..." scappato per sbaglio
+  return md.replace(/Fallback\.\.\./g, "");
 }
