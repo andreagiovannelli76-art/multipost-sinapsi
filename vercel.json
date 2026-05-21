@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://multipost-sinapsi.onrender.com/api/:match*"
+    }
+  ]
+}
