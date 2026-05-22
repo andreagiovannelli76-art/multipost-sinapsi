@@ -12,6 +12,7 @@ import {
   Loader2,
   MessageSquareText,
   Save,
+  Send,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -72,6 +73,9 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [generationMessageIndex, setGenerationMessageIndex] = useState(0);
   const [apiStatus, setApiStatus] = useState<{ ok: boolean; aiReady: boolean; provider?: string; model?: string } | null>(null);
+
+  // WEBHOOK MAKE.COM
+  const MAKE_WEBHOOK_URL = 'https://hook.eu1.make.com/1dhnn57w47bjq1wel62rphamo2bhnebo';
 
   useEffect(() => {
     setDrafts(draftStorage.list());
@@ -181,6 +185,37 @@ export default function App() {
     }
   };
 
+  // FUNZIONE PER SPEDIRE A MAKE.COM
+  const handleSendToMake = async (post: any) => {
+    try {
+      showToast('Spedizione a Make in corso...');
+      const payload = {
+        brand: brief.brandName,
+        platform: post.platform,
+        title: post.title,
+        content: post.content,
+        cta: post.cta,
+        assetIdea: post.assetIdea,
+        notes: post.notes,
+        timestamp: new Date().toISOString()
+      };
+
+      const res = await fetch(MAKE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        showToast('🚀 Post inviato con successo a Make!');
+      } else {
+        showToast('Errore durante l\'invio a Make.');
+      }
+    } catch (error) {
+      showToast('Errore di connessione al Webhook.');
+    }
+  };
+
   const handleSaveDraft = () => {
     const draft: Draft = {
       id: crypto.randomUUID(),
@@ -261,7 +296,7 @@ export default function App() {
         <div className="brand-block">
           <div className="brand-icon"><Wand2 size={22} /></div>
           <div>
-            <h1>{APP_CONFIG.name} v2.4.0</h1>
+            <h1>{APP_CONFIG.name} v2.4.1 (Make.com Ready)</h1>
             <p>{APP_CONFIG.payoff}</p>
           </div>
         </div>
@@ -298,9 +333,6 @@ export default function App() {
                 <div className="inline-actions">
                   <a className="secondary-action" href={APP_CONFIG.smeGptUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink size={18} /> GPT originale
-                  </a>
-                  <a className="secondary-action" href={APP_CONFIG.strategy12GptUrl} target="_blank" rel="noopener noreferrer">
-                    <CalendarDays size={18} /> Strategia 12 mesi
                   </a>
                   <button className="secondary-action" onClick={() => { briefStorage.clear(); setBrief(defaultBrief); }}>Reset</button>
                 </div>
@@ -400,7 +432,7 @@ export default function App() {
               {brief.format === 'strategia-12-mesi' && (
                 <div className="annual-mode-box">
                   <strong>Modalità Strategia Editoriale 12 Mesi attiva</strong>
-                  <p>Il motore SME genererà diagnosi, obiettivi annuali, pilastri editoriali, trimestri, temi mensili, calendario sostenibile, KPI e processo di revisione.</p>
+                  <p>Il motore SME genererà diagnosi, obiettivi annuali, pilastri editoriali, trimestri, temi mensili, calendario sostenibile, KPI e processo di revisione. Potrebbe richiedere 20-30 secondi.</p>
                 </div>
               )}
 
@@ -528,6 +560,9 @@ export default function App() {
                         </div>
 
                         <div className="post-actions">
+                          <button className="secondary-action" onClick={() => handleSendToMake(post)}>
+                            <Send size={18} /> Invia a Make
+                          </button>
                           <button className="secondary-action" onClick={() => handleCopy(copyId, post.content)}>
                             {copiedId === copyId ? <Check size={18} /> : <Copy size={18} />}
                             {copiedId === copyId ? 'Copiato' : 'Copia'}
@@ -608,7 +643,7 @@ export default function App() {
             <div className="section-title">
               <div>
                 <h2>Dati, privacy e integrazione SME</h2>
-                <p>Versione 2.4.0: Precisione editoriale Sinapsi (anti-clickbait e controllo tono istituzionale).</p>
+                <p>Versione 2.4.1: Integrazione Webhook Make.com per pubblicazione automatica.</p>
               </div>
               <ShieldCheck size={24} />
             </div>
