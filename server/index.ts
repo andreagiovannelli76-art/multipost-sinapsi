@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || '127.0.0.1';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const APP_VERSION = '2.3.8';
+const APP_VERSION = '2.3.9';
 const MAX_MASTER_TEXT_CHARS = 15000;
 
 type AiProvider = 'openai' | 'gemini' | 'local';
@@ -77,7 +77,6 @@ app.post('/api/campaign', async (req, res) => {
       return res.json(createFallbackCampaign(brief));
     }
 
-    // IL CHUNKING IN AZIONE: Generiamo prima il CORE, poi la STRATEGIA
     console.log(`[SME v${APP_VERSION}] Avvio generazione per formato: ${brief.format}`);
     const finalCampaign = await generateCampaignWithChunking(brief);
     
@@ -118,14 +117,13 @@ function getActiveModelName() {
   return 'mock-local-fallback';
 }
 
-// GESTORE DEL CHUNKING
 async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBrief>) {
   console.log(`[SME v${APP_VERSION}] Step 1: Generazione contenuti CORE...`);
   const coreData = activeProvider === 'gemini'
     ? await generateWithGemini(brief, 'core')
     : await generateWithOpenAI(brief, 'core');
 
-  let strategyData = createFallbackAnnualStrategy(brief); // Default di base
+  let strategyData = createFallbackAnnualStrategy(brief);
 
   if (brief.format === 'strategia-12-mesi') {
     console.log(`[SME v${APP_VERSION}] Step 2: Generazione STRATEGIA ANNUALE...`);
@@ -134,7 +132,6 @@ async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBr
       : await generateWithOpenAI(brief, 'strategy');
   }
 
-  // Uniamo i due pezzi del puzzle
   return {
     ...coreData,
     annualStrategy: strategyData
@@ -257,7 +254,6 @@ function validateBrief(brief: ReturnType<typeof normalizeBrief>) {
   return null;
 }
 
-// ISTRUZIONI DINAMICHE PER IL CHUNKING
 function buildUserInput(brief: ReturnType<typeof normalizeBrief>, taskType: TaskType) {
   const taskDescription = taskType === 'core' 
     ? 'Sei nello Step 1 (CORE). Genera SOLO la sintesi, gli avvisi, i ganci, i post per i canali e il calendario a breve termine. IGNORA la strategia 12 mesi.'
@@ -274,14 +270,14 @@ function buildUserInput(brief: ReturnType<typeof normalizeBrief>, taskType: Task
       'Rispetta i limiti caratteri.',
       'Produci contenuti pubblicabili in italiano.',
       'Se il masterText contiene claim rischiosi, correggili e aggiungi warning.',
-      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. È VIETATO usare termini promissori o assoluti come "profittevole", "successo", "garantito", o espressioni come "proteggere l\'investimento", a meno che non siano supportati da dati inconfutabili forniti nel brief. Sostituisci questi termini con concetti basati su metodo, analisi e potenziale. Non fare mai promesse sui ritorni.',
-      'PRECISIONE NUMERICA: Rispetta SEMPRE le liste e i numeri espliciti presenti nel brief. Se l\'utente indica 7 aspetti, 7 errori o 7 punti, ogni adattamento multicanale deve mantenere esattamente 7 punti, senza comprimerli, riassumerli o tagliarli autonomamente per motivi di formato.',
-      'DATI QUANTITATIVI: Evita formule quantitative non supportate da dati (es. "può raddoppiare l\'investimento", "aumenta del 30%"). Preferisci formule prudenti come "può incidere molto", "può modificare il margine", o "può rendere l\'operazione meno sostenibile".'
+      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. Sostituisci termini come "successo" o "garantito" con concetti basati su metodo e analisi. Non fare promesse sui ritorni.',
+      'PRECISIONE NUMERICA: Rispetta SEMPRE le liste e i numeri espliciti presenti nel brief (es. se ci sono 7 punti, mantieni 7 punti esatti ovunque).',
+      'DATI QUANTITATIVI E ASSOLUTI: Evita formule quantitative non supportate da dati. Evita frasi assolute o iperboliche come "è una scienza"; usa invece "processo basato su dati" o "metodo". Preferisci "margine realistico" a "guadagno effettivo" o "margine effettivo".',
+      'LUNGHEZZA E SINTESI: Per Instagram, sii estremamente sintetico nelle slide, usa frasi brevi e asciutte. Per Facebook, mantieni un tono naturale e narrativo, ma sii conciso (riduci la prolissità didattica e accorcia il testo del 25% rispetto al solito).'
     ]
   });
 }
 
-// SCHEMA 1: SOLO I CONTENUTI
 const coreCampaignSchema = {
   type: 'object',
   additionalProperties: false,
@@ -329,7 +325,6 @@ const coreCampaignSchema = {
   }
 } as const;
 
-// SCHEMA 2: SOLO LA STRATEGIA
 const annualStrategySchema = {
   type: 'object',
   additionalProperties: false,
