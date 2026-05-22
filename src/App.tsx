@@ -24,7 +24,7 @@ import type { CampaignBrief, CampaignObjective, CampaignResult, Draft, FormatMod
 import { generateCampaign, checkHealth } from './lib/api';
 import { briefStorage, downloadTextFile, draftStorage } from './lib/storage';
 
-// 1. DATI SINAPSI HARDCODATI E AGGIORNATI (v2.3.7)
+// 1. DATI SINAPSI HARDCODATI E AGGIORNATI (v2.3.9)
 const defaultBrief: CampaignBrief = {
   masterText: '',
   platforms: DEFAULT_PLATFORMS,
@@ -40,11 +40,8 @@ const defaultBrief: CampaignBrief = {
     positioning: 'Sinapsi Real Estate non vende occasioni immobiliari. Costruisce operazioni immobiliari ragionate, valutando prezzo, rischio, lavori, tempi, mercato e margine prima di decidere.',
     offer: 'Consulenza strategica per investimenti immobiliari, analisi operazioni, ristrutturazione e valorizzazione.',
     brandVoice: 'Professionale, chiaro, concreto, non aggressivo. Linguaggio estremamente prudente sui risultati.',
-    // Aggiunte le tue parole specifiche per alzare l'autorevolezza
     wordsToUse: 'operazioni ragionate, maggiore consapevolezza, margine realistico, operazione più controllata, metodo, rischio, valore, analisi, numeri, strategia',
-    // Inseriti i ban per le frasi troppo commerciali
-    wordsToAvoid: 'affare sicuro, guadagno garantito, rischio zero, occasione imperdibile, soldi facili, operazioni solide, dormire sonni più tranquilli, potenziale guadagno effettivo, operazione più sicura',
-    // Inseriti i contatti reali definitivi
+    wordsToAvoid: 'affare sicuro, guadagno garantito, rischio zero, occasione imperdibile, soldi facili, operazioni solides, dormire sonni più tranquilli, potenziale guadagno effettivo, operazione più sicura',
     websiteOrContact: 'www.sinapsirealestatesrl.it | a.giovannelli@sinapsirealestatesrl.it | +39 348 479 1772'
   }
 };
@@ -265,7 +262,7 @@ export default function App() {
         <div className="brand-block">
           <div className="brand-icon"><Wand2 size={22} /></div>
           <div>
-            <h1>{APP_CONFIG.name} v2.3.8</h1>
+            <h1>{APP_CONFIG.name} v2.3.9</h1>
             <p>{APP_CONFIG.payoff}</p>
           </div>
         </div>
@@ -467,7 +464,7 @@ export default function App() {
                 <div className="empty-state">
                   <Sparkles size={42} />
                   <h3>Nessuna campagna generata</h3>
-                  <p>Compila il brief e genera una campagna per vedere le versioni adattate.</p>
+                  <p>Compila il brief e generates una campagna per vedere le versioni adattate.</p>
                 </div>
               )}
 
@@ -612,7 +609,7 @@ export default function App() {
             <div className="section-title">
               <div>
                 <h2>Dati, privacy e integrazione SME</h2>
-                <p>Versione 2.3.7: Inserimento contatti reali Sinapsi e dizionario prudenziale rinforzato.</p>
+                <p>Versione 2.3.9: Ottimizzazione lunghezze social, controllo precisione numerica e ban frasi assolute.</p>
               </div>
               <ShieldCheck size={24} />
             </div>
@@ -621,7 +618,7 @@ export default function App() {
               <div className="settings-card">
                 <h3>Motore AI interno</h3>
                 <p><strong>{APP_CONFIG.engineName}</strong></p>
-                <p>Il prompt è in <code>server/smePrompt.ts</code>. Incolla lì le istruzioni esatte del tuo GPT personalizzato per allineare il comportamento.</p>
+                <p>Il prompt è in <code>server/smePrompt.ts</code>. Incolla lì las istruzioni esatte del tuo GPT personalizzato per allineare il comportamento.</p>
               </div>
               <div className="settings-card highlight-card">
                 <h3>GPT originale su ChatGPT</h3>
