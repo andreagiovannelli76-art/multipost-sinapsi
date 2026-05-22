@@ -24,7 +24,7 @@ import type { CampaignBrief, CampaignObjective, CampaignResult, Draft, FormatMod
 import { generateCampaign, checkHealth } from './lib/api';
 import { briefStorage, downloadTextFile, draftStorage } from './lib/storage';
 
-// 1. DATI SINAPSI HARDCODATI E AGGIORNATI (v2.3.9)
+// 1. DATI SINAPSI HARDCODATI E AGGIORNATI (v2.4.0)
 const defaultBrief: CampaignBrief = {
   masterText: '',
   platforms: DEFAULT_PLATFORMS,
