@@ -117,6 +117,7 @@ function getActiveModelName() {
   return 'mock-local-fallback';
 }
 
+// === IL CUORE DELLA MODIFICA: IL RESPIRO ARTIFICIALE ===
 async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBrief>) {
   console.log(`[SME v${APP_VERSION}] Step 1: Generazione contenuti CORE...`);
   const coreData = activeProvider === 'gemini'
@@ -126,7 +127,11 @@ async function generateCampaignWithChunking(brief: ReturnType<typeof normalizeBr
   let strategyData = createFallbackAnnualStrategy(brief);
 
   if (brief.format === 'strategia-12-mesi') {
-    console.log(`[SME v${APP_VERSION}] Step 2: Generazione STRATEGIA ANNUALE...`);
+    console.log(`[SME v${APP_VERSION}] Pausa strategica anti-blocco di 10 secondi per Google Gemini...`);
+    // Mettiamo il server in attesa per 10 secondi per far resettare i limiti di Gemini
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    
+    console.log(`[SME v${APP_VERSION}] Step 2: Generazione STRATEGIA ANNUALE in corso...`);
     strategyData = activeProvider === 'gemini'
       ? await generateWithGemini(brief, 'strategy')
       : await generateWithOpenAI(brief, 'strategy');
