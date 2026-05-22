@@ -184,12 +184,12 @@ export default function App() {
     if (file) showToast(`File "${file.name}" pronto per l'invio.`);
   };
 
-  // FUNZIONE AUSILIARIA PER TRASFORMARE IL FILE IN BASE64
+  // FUNZIONE AUSILIARIA PER TRASFORMARE IL FILE IN BASE64 (ORA PULITA PER MAKE)
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
+      reader.onload = () => resolve((reader.result as string).split(',')[1]);
       reader.onerror = error => reject(error);
     });
   };
@@ -225,7 +225,7 @@ export default function App() {
         assetIdea: post.assetIdea,
         notes: post.notes,
         timestamp: new Date().toISOString(),
-        file: filePayload // Questo conterrà la stringa del file completo (Qualsiasi formato!)
+        file: filePayload
       };
 
       const res = await fetch(MAKE_WEBHOOK_URL, {
