@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT || 8787);
 const HOST = process.env.HOST || '127.0.0.1';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o';
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-const APP_VERSION = '2.3.9';
+const APP_VERSION = '2.4.0';
 const MAX_MASTER_TEXT_CHARS = 15000;
 
 type AiProvider = 'openai' | 'gemini' | 'local';
@@ -270,10 +270,11 @@ function buildUserInput(brief: ReturnType<typeof normalizeBrief>, taskType: Task
       'Rispetta i limiti caratteri.',
       'Produci contenuti pubblicabili in italiano.',
       'Se il masterText contiene claim rischiosi, correggili e aggiungi warning.',
-      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. Sostituisci termini come "successo" o "garantito" con concetti basati su metodo e analisi. Non fare promesse sui ritorni.',
-      'PRECISIONE NUMERICA: Rispetta SEMPRE le liste e i numeri espliciti presenti nel brief (es. se ci sono 7 punti, mantieni 7 punti esatti ovunque).',
-      'DATI QUANTITATIVI E ASSOLUTI: Evita formule quantitative non supportate da dati. Evita frasi assolute o iperboliche come "è una scienza"; usa invece "processo basato su dati" o "metodo". Preferisci "margine realistico" a "guadagno effettivo" o "margine effettivo".',
-      'LUNGHEZZA E SINTESI: Per Instagram, sii estremamente sintetico nelle slide, usa frasi brevi e asciutte. Per Facebook, mantieni un tono naturale e narrativo, ma sii conciso (riduci la prolissità didattica e accorcia il testo del 25% rispetto al solito).'
+      'REGOLA CRITICA DI COMPLIANCE: Adotta un linguaggio prudente e fattuale. Sostituisci termini promissori con concetti basati su metodo e analisi.',
+      'PRECISIONE NUMERICA: Rispetta SEMPRE le liste e i numeri espliciti presenti nel brief (es. se ci sono 7 punti, mantieni 7 punti esatti ovunque senza tagliarli).',
+      'TITOLI E HOOK (NO CLICKBAIT): Evita assolutamente titoli da "creator" (es. "Quello che nessuno ti dice", "Gli errori che fai"). Usa un tono istituzionale (es. "7 elementi da analizzare", "Controlli prima di decidere"). Su TikTok/Reel usa hook forti ma mai aggressivi o colpevolizzanti.',
+      'LESSICO IMPRENDITORIALE: Evita frasi emotive, drammatiche o assolute (es. "è una scienza", "il mercato non perdona", "per dormire sereno"). Usa formule misurate e professionali: "processo basato su dati", "una stima prudente riduce il rischio", "valutazione controllata", "margine realistico", "operazione più consapevole".',
+      'LUNGHEZZA E SINTESI: Per Instagram, sii estremamente sintetico nelle slide, usa frasi brevi e asciutte. Per Facebook, mantieni un tono naturale e narrativo, ma sii conciso (accorcia il testo del 25% rispetto al solito).'
     ]
   });
 }
