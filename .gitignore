@@ -1,1 +1,4 @@
 node_modules/
+
+# Vercel: mai committare la cartella locale del progetto né i token
+.vercel/
